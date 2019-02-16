@@ -1,1 +1,4 @@
-﻿  rl-gameleave.vcxproj -> K:\Code\GitHub\rl-gameleave\client\rl-gameleave\Debug\rl-gameleave.exe
+﻿  main.cpp
+k:\code\github\rl-gameleave\client\rl-gameleave\rl-gameleave\main.cpp(120): warning C4018: '<': signed/unsigned mismatch
+k:\code\github\rl-gameleave\client\rl-gameleave\rl-gameleave\main.cpp(153): warning C4101: 'ip': unreferenced local variable
+  rl-gameleave.vcxproj -> K:\Code\GitHub\rl-gameleave\client\rl-gameleave\Debug\rl-gameleave.exe

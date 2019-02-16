@@ -2,6 +2,12 @@
 #include <tchar.h>
 
 #include "resource.h"
+#include <cstdio>
+#include <ostream>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
 
 /*variables*/
 UINT WM_TASKBAR = 0;
@@ -9,7 +15,7 @@ HWND Hwnd;
 HMENU Hmenu;
 NOTIFYICONDATA notifyIconData;
 TCHAR szTIP[64] = TEXT("Snoopy.. \n Kicks Ass!");
-char szClassName[] = "Snoopy's System Tray Demo.";
+char szClassName[] = "Tray Demo";
 
 
 
@@ -18,7 +24,6 @@ LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 void minimize();
 void restore();
 void InitNotifyIconData();
-
 
 
 int WINAPI WinMain(HINSTANCE hThisInstance,
@@ -69,6 +74,15 @@ int WINAPI WinMain(HINSTANCE hThisInstance,
 	/* Make the window visible on the screen */
 	ShowWindow(Hwnd, nCmdShow);
 
+	if (RegisterHotKey(
+		Hwnd,
+		1,
+		MOD_ALT | MOD_NOREPEAT,
+		0x58))  //0x42 is 'b'
+	{
+		OutputDebugString(_T("Hotkey 'ALT+b' registered, using MOD_NOREPEAT flag\n"));
+	}
+
 	/* Run the message loop. It will run until GetMessage() returns 0 */
 	while (GetMessage(&messages, NULL, 0, 0))
 	{
@@ -81,6 +95,45 @@ int WINAPI WinMain(HINSTANCE hThisInstance,
 	return messages.wParam;
 }
 
+/*int SendKeys(const std::string & msg) {
+	int taille = msg.size();
+
+	std::vector<INPUT> inputs(taille);
+
+	for (int i = 0; i < taille; ++i)
+	{
+		INPUT &input = inputs[i];
+		input.type = INPUT_KEYBOARD;
+		input.ki.wVk = 0;
+		input.ki.wScan = msg.at(i);
+		input.ki.dwFlags = KEYEVENTF_UNICODE;
+		input.ki.time = 0;
+		input.ki.dwExtraInfo = GetMessageExtraInfo();
+
+	}
+	SendInput(inputs.size(), &inputs[0], sizeof(INPUT));
+	return 1;
+}*/
+
+int SendKeys(const std::string & msg) {
+
+	for (int i = 0; i < msg.size(); ++i)
+	{
+		INPUT input;
+		input.type = INPUT_KEYBOARD;
+		input.ki.wVk = 0;
+		input.ki.wScan = msg.at(i);
+		input.ki.dwFlags = KEYEVENTF_UNICODE;
+		input.ki.time = 0;
+		input.ki.dwExtraInfo = GetMessageExtraInfo();
+
+		SendInput(1, &input, sizeof(INPUT));
+
+		input.ki.dwFlags = KEYEVENTF_KEYUP;
+		SendInput(1, &input, sizeof(INPUT));
+	}
+	return 1;
+}
 
 /*  This function is called by the Windows function DispatchMessage()  */
 
@@ -96,6 +149,8 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 	PAINTSTRUCT ps;
 	HDC hdc;
 	TCHAR greeting[] = _T("Test Text");
+	TCHAR hotkeytext[] = _T("Hotkey Test");
+	INPUT ip;
 
 	switch (message)                  /* handle the messages */
 	{
@@ -108,6 +163,33 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 		Hmenu = CreatePopupMenu();
 		AppendMenu(Hmenu, MF_STRING, ID_TRAY_EXIT, TEXT("Exit"));
 
+		break;
+	case WM_HOTKEY:
+		Sleep(1000);
+		while(GetAsyncKeyState(18))
+		{
+			
+		}
+
+		//Wait till ALT not pressed anymore
+		SendKeys("test string double char gg oo ee <<");
+		/*
+		ip.type = INPUT_KEYBOARD;
+		ip.ki.wScan = 0; // hardware scan code for key
+		ip.ki.time = 0;
+		ip.ki.dwExtraInfo = 0;
+
+		// Press the "A" key
+		ip.ki.wVk = 0x41; // virtual-key code for the "a" key
+		ip.ki.dwFlags = 0; // 0 for key press
+
+		//Send the press
+		SendInput(1, &ip, sizeof(INPUT));
+
+		//Prepare a keyup event
+		ip.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+		SendInput(1, &ip, sizeof(INPUT));*/
+		OutputDebugString(_T("Test"));
 		break;
 	case WM_PAINT:
 		hdc = BeginPaint(Hwnd, &ps);
